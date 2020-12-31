@@ -6,8 +6,7 @@ const app = express();
 const path = require("path");
 app.use(body_parser.json()); //using the body_parser
 app.use(body_parser.urlencoded({ extended: true }));
-app.use(cors); //using cors
-app.use(express.static(path.join(__dirname, "../dist")));
+//app.use(cors); //using cors
 app.use(function (req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
@@ -18,7 +17,7 @@ const connectDB = async () => {
   try {
     //Connecting to the mongoDB
     const conn = await mongoose.connect(
-      "mongodb+srv://chgh:adminrootnimda@cluster0.cmtlq.mongodb.net/Cluster0?retryWrites=true&w=majority",
+      `mongodb+srv://chgh:adminrootnimda@cluster0.cmtlq.mongodb.net/Cluster0?retryWrites=true&w=majority`,
       {
         useNewUrlParser: true,
         useUnifiedTopology: true,
@@ -39,7 +38,5 @@ let modulee = require("./Controllers/Recette");
 modulee.controller(app); //use the controllers (the API Functions)
 app.use(express.static(__dirname + "/dist/"));
 app.get(/.*/, (req, res) => res.sendFile(__dirname + "/dist/index.html"));
-const port = 8082;
-app.listen(port, function () {
-  console.log(" RestAPI running on port " + port);
-});
+
+app.listen(process.env.PORT || 8082);
