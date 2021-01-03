@@ -41,32 +41,24 @@
                 ></b-form-input>
               </b-col>
               <b-col class="align" sm="3" v-if="type == 'Etapes'">
-                <b-button variant="warning" @click="addEtape()"
+                <b-button
+                  id="buttontarget"
+                  variant="warning"
+                  @click="addEtape()"
                   ><b-icon icon="plus-square" aria-hidden="true"></b-icon
                 ></b-button>
               </b-col>
               <b-col sm="5" v-if="type == 'Ingrédients'">
                 <b-form-input
-                  @mouseenter="tooltipVar = true"
                   :placeholder="type"
                   v-model.lazy="Ingrédient"
                 ></b-form-input>
               </b-col>
 
               <b-col class="align" sm="3" v-if="type == 'Ingrédients'">
-                <b-button
-                  id="buttontarget"
-                  variant="warning"
-                  @click="addIngrédient()"
+                <b-button variant="warning" @click="addIngrédient()"
                   ><b-icon icon="plus-square" aria-hidden="true"></b-icon
                 ></b-button>
-                <b-tooltip
-                  :show="tooltipVar"
-                  variant="warning"
-                  :target="buttontarget"
-                >
-                  N'oublier pas d'ajouter l'ingrédient a la file de recherche
-                </b-tooltip>
               </b-col>
             </b-row>
             <b-row>
@@ -173,6 +165,15 @@
           ></b-row
         >
       </b-modal>
+      <b-popover
+        :show="tooltipVar"
+        ref="popover"
+        :placement="'bottomright'"
+        target="buttontarget"
+        variant="danger"
+      >
+        Ajouter l'ingrédient ou l'étape a la file d'enregistrement'
+      </b-popover>
     </div>
   </div>
 </template>
@@ -192,9 +193,7 @@ export default {
     return {
       previewImage: null,
       Image: null,
-      tooltipVar: true,
-      buttontarget: "buttontarget",
-      show: true,
+      tooltipVar: false,
       Ingrédient: "",
       Etape: "",
       Ingrédients: [],
@@ -204,6 +203,24 @@ export default {
       Nb_personnes: null,
       types: ["Auteur", "Nom", "Ingrédients", "Etapes", "Nb_personnes"]
     };
+  },
+
+  created() {
+    setTimeout(
+      () => (this.tooltipVar = true),
+
+      1000
+    );
+    setTimeout(
+      () => this.$refs.popover.$emit("disable"),
+
+      6000
+    );
+    setTimeout(
+      () => (this.tooltipVar = false),
+
+      5500
+    );
   },
   methods: {
     showModalSubmit() {
@@ -227,14 +244,20 @@ export default {
       };
     },
     addIngrédient() {
-      this.buttontarget = "non";
-      this.tooltipVar = false;
-      this.Ingrédients.push(this.Ingrédient);
-      this.Ingrédient = "";
+      if (this.Ingrédient == "") {
+        this.showModalError();
+      } else {
+        this.Ingrédients.push(this.Ingrédient);
+        this.Ingrédient = "";
+      }
     },
     addEtape() {
-      this.Etapes.push(this.Etape);
-      this.Etape = "";
+      if (this.Etape == "") {
+        this.showModalError();
+      } else {
+        this.Etapes.push(this.Etape);
+        this.Etape = "";
+      }
     },
 
     submitRecette() {

@@ -11,17 +11,23 @@
       <h5 class="text-white">Saisir Vos Ingrédients :</h5>
       <b-col sm="2">
         <b-form-input
-          @mouseenter="tooltipVar = true"
+          placeholder="ingrédient"
           v-model.lazy="Ingrédient"
         ></b-form-input>
       </b-col>
       <b-col class="align" sm="1">
         <b-button id="buttontarget" variant="warning" @click="addIngrédient()"
           ><b-icon icon="plus-square" aria-hidden="true"></b-icon
-        ></b-button>
-        <b-tooltip :show="tooltipVar" variant="warning" :target="buttontarget">
-          N'oublier pas d'ajouter l'ingrédient a la file de recherche
-        </b-tooltip>
+          ><b-popover
+            ref="popover"
+            :show="tooltipVar"
+            :placement="'bottomleft'"
+            target="buttontarget"
+            variant="danger"
+          >
+            Ajouter l'ingrédient a la file de recherche
+          </b-popover></b-button
+        >
       </b-col>
       <b-col class="align" sm="3">
         <h6 class="text-white">
@@ -36,7 +42,7 @@
           step="1"
         ></b-form-input>
 
-        <h6 class="text-white">{{ relevancefunction }}</h6>
+        <h6 class="text-white">{{ relevance }}</h6>
       </b-col>
       <b-row>
         <b-col cols="12" md="auto">
@@ -133,6 +139,24 @@
           </b-row>
         </b-card>
       </div>
+      <b-modal size="md" ref="modal1" hide-footer hide-title>
+        <b-row
+          ><b-col lg="12" class="d-block text-center">
+            <h1></h1>
+            <h4>S'il vous plait vérifier votre saisie !</h4>
+          </b-col>
+          <b-col lg="6" offset-md="3">
+            <b-button
+              variant="outline-danger"
+              block
+              @click="hideModalError"
+              hand-thumbs-up
+              ><b-icon icon="hand-thumbs-up" aria-hidden="true"></b-icon
+              >Ok</b-button
+            ></b-col
+          ></b-row
+        >
+      </b-modal>
       <b-modal size="md" ref="modal" hide-footer hide-title>
         <b-row
           ><b-col lg="12" class="d-block text-center">
@@ -165,9 +189,8 @@ export default {
       Ingrédients: [],
       Ingrédient: "",
       relevance: 1,
-      tooltipVar: true,
-      buttontarget: "buttontarget",
-      resertRecette: []
+      resetRecettes: [],
+      tooltipVar: false
     };
   },
   async beforeCreate() {
@@ -175,18 +198,28 @@ export default {
       .get("http://desolate-wildwood-60843.herokuapp.com/bringRecettes")
       .then(resp => {
         this.FiltredRecettes = resp.data;
-        this.resertRecette = resp.data;
+        this.resetRecettes = resp.data;
       });
+  },
+  created() {
+    setTimeout(
+      () => (this.tooltipVar = true),
+
+      1000
+    );
+    setTimeout(
+      () => this.$refs.popover.$emit("disable"),
+
+      6000
+    );
+    setTimeout(
+      () => (this.tooltipVar = false),
+
+      5500
+    );
   },
 
   computed: {
-    relevancefunction() {
-      if (this.relevance > 5) {
-        return this.relevance + "(low)";
-      } else {
-        return this.relevance + "(Hight)";
-      }
-    },
     IngrédientsSearch() {
       if (this.Ingrédients.length == 0) {
         return "Pas d'ingrédients";
@@ -196,8 +229,14 @@ export default {
     }
   },
   methods: {
+    showModalError() {
+      this.$refs["modal1"].show();
+    },
+    hideModalError() {
+      this.$refs["modal1"].hide();
+    },
     reset() {
-      this.FiltredRecettes = this.resertRecette;
+      this.FiltredRecettes = this.resetRecettes;
     },
     showModalSubmit() {
       this.$refs["modal"].show();
@@ -224,10 +263,12 @@ export default {
       }
     },
     addIngrédient() {
-      this.buttontarget = "non";
-      this.tooltipVar = false;
-      this.Ingrédients.push(this.Ingrédient);
-      this.Ingrédient = "";
+      if (this.Ingrédient == "") {
+        this.showModalError();
+      } else {
+        this.Ingrédients.push(this.Ingrédient);
+        this.Ingrédient = "";
+      }
     }
   }
 };
