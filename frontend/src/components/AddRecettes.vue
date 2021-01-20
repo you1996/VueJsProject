@@ -172,7 +172,7 @@
         target="buttontarget"
         variant="danger"
       >
-        Ajouter l'ingrédient ou l'étape a la file d'enregistrement'
+        Ajouter l'ingrédient ou l'étape a la file d'enregistrement
       </b-popover>
     </div>
   </div>
@@ -206,6 +206,7 @@ export default {
   },
 
   created() {
+    //handling the time to show and hide the tooltips
     setTimeout(
       () => (this.tooltipVar = true),
 
@@ -221,8 +222,10 @@ export default {
 
       5500
     );
+    ////
   },
   methods: {
+    
     showModalSubmit() {
       this.$refs["modal"].show();
     },
@@ -243,6 +246,7 @@ export default {
         this.previewImage = e.target.result;
       };
     },
+    ///Onclickhandler to add the ingredient to an array
     addIngrédient() {
       if (this.Ingrédient == "") {
         this.showModalError();
@@ -251,6 +255,8 @@ export default {
         this.Ingrédient = "";
       }
     },
+    ////
+    ///Onclickhandler to add the Etape to an array
     addEtape() {
       if (this.Etape == "") {
         this.showModalError();
@@ -260,6 +266,7 @@ export default {
       }
     },
 
+    ///verifie data and send it to backend 
     submitRecette() {
       if (
         this.previewImage == null ||

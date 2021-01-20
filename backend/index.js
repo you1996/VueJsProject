@@ -3,16 +3,16 @@ const body_parser = require("body-parser");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const app = express();
-const path = require("path");
 app.use(body_parser.json()); //using the body_parser
 app.use(body_parser.urlencoded({ extended: true }));
-//app.use(cors); //using cors
 app.use(function (req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   next();
 }); //For the CORS allow error
+app.use(cors()); //using cors
+
 const connectDB = async () => {
   try {
     //Connecting to the mongoDB
@@ -36,7 +36,7 @@ connectDB();
 
 let modulee = require("./Controllers/Recette");
 modulee.controller(app); //use the controllers (the API Functions)
-app.use(express.static(__dirname + "/dist/"));
-app.get(/.*/, (req, res) => res.sendFile(__dirname + "/dist/index.html"));
+app.use(express.static(__dirname + "/dist/")); ///the directory to the frontend
+app.get(/.*/, (req, res) => res.sendFile(__dirname + "/dist/index.html")); ////the index.html is the file to send to the user
 
 app.listen(process.env.PORT || 8082);

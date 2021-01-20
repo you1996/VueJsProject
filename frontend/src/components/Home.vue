@@ -26,7 +26,7 @@
             </div>
           </div></div
       ></b-col>
-      <b-col col lg="4" offset-md="3">
+      <b-col col lg="4" offset-lg="3">
         <div class="wrapper">
           <div>
             <router-link class="a" to="/addRecette"

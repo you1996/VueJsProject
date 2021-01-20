@@ -9,7 +9,7 @@
     </div>
     <b-row align-h="center" class="text-center">
       <h5 class="text-white">Saisir Vos Ingrédients :</h5>
-      <b-col sm="2">
+      <b-col sm="3">
         <b-form-input
           placeholder="ingrédient"
           v-model.lazy="Ingrédient"
@@ -45,10 +45,11 @@
         <h6 class="text-white">{{ relevance }}</h6>
       </b-col>
       <b-row>
-        <b-col cols="12" md="auto">
+        <b-col cols="8" md="auto">
           <h4>
             <b-badge variant="danger">{{ IngrédientsSearch }}</b-badge>
           </h4>
+
           <h5
             class="text-white"
             v-for="(Ingr, index) in Ingrédients"
@@ -205,21 +206,22 @@ export default {
     setTimeout(
       () => (this.tooltipVar = true),
 
-      1000
+      2000
     );
     setTimeout(
       () => this.$refs.popover.$emit("disable"),
 
-      6000
+      7000
     );
     setTimeout(
       () => (this.tooltipVar = false),
 
-      5500
+      6500
     );
   },
 
   computed: {
+    ////Handle the text when the query array is empty or not
     IngrédientsSearch() {
       if (this.Ingrédients.length == 0) {
         return "Pas d'ingrédients";
@@ -235,8 +237,10 @@ export default {
     hideModalError() {
       this.$refs["modal1"].hide();
     },
+    //reset button handler
     reset() {
       this.FiltredRecettes = this.resetRecettes;
+      this.Ingrédients = [];
     },
     showModalSubmit() {
       this.$refs["modal"].show();
@@ -244,24 +248,25 @@ export default {
     hideModalSubmit() {
       this.$refs["modal"].hide();
     },
+    ///handle the search
     filterRecettes() {
       if (this.Ingrédients.length != 0) {
         let params = {
           relevance: this.relevance,
           Ingrédients: this.Ingrédients
         };
-        axios //Get Recettes with passing the query to mongodb search index
+        axios //Get Recettes by sending the query to mongodb search index
           .get("http://desolate-wildwood-60843.herokuapp.com/filterRecettes", {
             params
           })
           .then(resp => {
             this.FiltredRecettes = resp.data;
           });
-        this.Ingrédients = [];
       } else {
         this.showModalSubmit();
       }
     },
+    ///Add the ingredient to the ingredients list
     addIngrédient() {
       if (this.Ingrédient == "") {
         this.showModalError();
