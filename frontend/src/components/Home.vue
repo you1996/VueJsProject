@@ -1,10 +1,7 @@
 <template>
   <div class="div">
     <div class="Home">
-      <h1>
-        Site Name <br />
-        <span>Description </span>
-      </h1>
+      <h1>Poly M'Angers <br /></h1>
     </div>
 
     <b-row>

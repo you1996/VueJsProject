@@ -77,13 +77,35 @@
       <div v-else>
         <b-card
           v-for="item in this.FiltredRecettes"
-          :key="item.id"
+          :key="item._id"
           v-bind:header="item.Nom"
           style="width:auto;"
           class="mb-2"
           header-text-variant="white"
           header-bg-variant="danger"
         >
+          <template #header>
+            <b-row align-v="center">
+              <b-col md="2"> </b-col>
+              <b-col md="9">
+                <h4>{{ item.Nom }}</h4>
+              </b-col>
+              <b-col md="1">
+                <b-button
+                  class="badgerate"
+                  @click="AddStars(item)"
+                  variant="warning"
+                  pill
+                  ><b-icon
+                    :icon="item.icon"
+                    font-scale="1"
+                    variant="danger"
+                  ></b-icon>
+                  <h5>{{ item.Hearts }}</h5></b-button
+                >
+              </b-col>
+            </b-row></template
+          >
           <b-row no-gutters>
             <b-col md="6" class="text-md-left">
               <b-card-img
@@ -140,6 +162,27 @@
           </b-row>
         </b-card>
       </div>
+      <b-modal size="md" ref="modal2" hide-footer hide-title>
+        <b-row
+          ><b-col lg="12" class="d-block text-center">
+            <h1></h1>
+            <h4>
+              C'est vrai la recette est délicieuse!<br />Vous avez déjà aimé cet
+              recette
+            </h4>
+          </b-col>
+          <b-col lg="6" offset-md="3">
+            <b-button
+              variant="outline-danger"
+              block
+              @click="hideModalRate"
+              hand-thumbs-up
+              ><b-icon icon="hand-thumbs-up" aria-hidden="true"></b-icon
+              >Ok</b-button
+            ></b-col
+          ></b-row
+        >
+      </b-modal>
       <b-modal size="md" ref="modal1" hide-footer hide-title>
         <b-row
           ><b-col lg="12" class="d-block text-center">
@@ -181,9 +224,17 @@
 </template>
 
 <script>
+import { BButton } from "bootstrap-vue";
+
+import { BModal } from "bootstrap-vue";
+
 import axios from "axios";
 
 export default {
+  components: {
+    BButton,
+    BModal
+  },
   data() {
     return {
       FiltredRecettes: null,
@@ -191,7 +242,9 @@ export default {
       Ingrédient: "",
       relevance: 1,
       resetRecettes: [],
-      tooltipVar: false
+      tooltipVar: false,
+      icononclickItem: null,
+      localHearts: []
     };
   },
   async beforeCreate() {
@@ -200,6 +253,7 @@ export default {
       .then(resp => {
         this.FiltredRecettes = resp.data;
         this.resetRecettes = resp.data;
+        this.FiltredRecettes.forEach(item => (item["icon"] = "heart"));
       });
   },
   created() {
@@ -230,7 +284,41 @@ export default {
       }
     }
   },
+
   methods: {
+    AddStars(item) {
+      if (this.CheckHearts(item.Nom) == true) {
+        this.showModalRate();
+      } else {
+        if (item["Hearts"] >= 0) {
+          item["Hearts"] += 1;
+        } else {
+          //item["Hearts"] = 1;
+          this.$set(item, "Hearts", 1);
+        }
+        item.icon = "heart-fill";
+        localStorage.setItem(item.Nom, item.Nom);
+      }
+      axios.post("http://desolate-wildwood-60843.herokuapp.com/addRate", item);
+    },
+    CheckHearts(Nom) {
+      var LovedBefore = { ...localStorage };
+      if (Object.keys(LovedBefore).length != 0) {
+        for (let i = 0; i < localStorage.length; i++) {
+          if (localStorage.getItem(Nom) != null) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+      } else return 0;
+    },
+    showModalRate() {
+      this.$refs["modal2"].show();
+    },
+    hideModalRate() {
+      this.$refs["modal2"].hide();
+    },
     showModalError() {
       this.$refs["modal1"].show();
     },
@@ -292,6 +380,63 @@ export default {
   font-size: 72px;
   text-transform: capitalize;
 }
+.b-form-rating {
+  background-color: transparent;
+}
+.badgerate {
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: block;
+  position: absolute;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: -45px;
+  right: -20px;
+  transition: all 0.3s;
+}
+
+.icon-border {
+  margin-right: 3px;
+}
+
+.icononclickItem {
+  position: relative;
+  background-color: #4caf50;
+  border: none;
+  font-size: 28px;
+  color: #ffffff;
+  padding: 20px;
+  width: 200px;
+  text-align: center;
+  -webkit-transition-duration: 0.4s; /* Safari */
+  transition-duration: 0.4s;
+  text-decoration: none;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.icononclickItem:after {
+  content: "";
+  background: #000000;
+  display: block;
+  position: absolute;
+  padding-top: 300%;
+  padding-left: 350%;
+  margin-left: -20px !important;
+  margin-top: -120%;
+  opacity: 0;
+  transition: all 0.8s;
+}
+.icononclickItem:active:after {
+  padding: 0;
+  margin: 0;
+  opacity: 1;
+  transition: 0s;
+}
+
 .b-button {
   margin: 9px;
 }

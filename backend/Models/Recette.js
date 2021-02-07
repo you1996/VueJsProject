@@ -8,6 +8,7 @@ const RecetteSchema = new Schema({
   Etapes: { type: Array, required: true },
   Auteur: { type: String },
   Recette_pour: { type: Number },
+  Hearts: { type: Number },
 });
 const Recette = mongoose.model("Recette", RecetteSchema);
 module.exports = Recette;
